@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>月度加班費計算器</title>
+        <title>冠宇加班費計算器</title>
         <!-- Add SheetJS Library -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
         <style>
@@ -39,7 +39,7 @@
             }
 
             .month-selector {
-                display: inline-flex;
+                display: flex;
                 align-items: center;
                 gap: 10px;
                 background-color: #f8f9fa;
@@ -345,7 +345,7 @@
                     font-size: 0.95em;
                 }
                 .time-input {
-                    width: 100px;
+                    width: 130px;
                     padding: 5px 6px;
                     font-size: 0.9em;
                 }
@@ -404,8 +404,8 @@
                     font-size: 0.9em;
                 }
                 .time-input {
-                    width: 105px;
-                    font-size: 0.85em;
+                    width: 125px;
+                    font-size: 0.95em;
                 }
 
                 /* RWD for Action Buttons */
@@ -449,7 +449,7 @@
     </head>
     <body>
         <div class="container">
-            <h1>月度加班費計算器</h1>
+            <h1>冠宇加班費計算器</h1>
 
             <div class="controls">
                 <div class="month-selector">
@@ -489,7 +489,7 @@
                     <label for="excel-file-input" class="action-btn import-btn">匯入 Excel</label>
                     <input type="file" id="excel-file-input" accept=".xlsx, .xls" onchange="handleExcelImport(event)" />
                     <!-- Changed the invalid button to a styled link -->
-                    <a href="https://louis-check-in-html.vercel.app/excelDemo.xlsx" target="_blank" class="action-btn template-btn">Excel 範本</a>
+                    <a href="https://louis-check-in-html.vercel.app/excelDemo.xlsx" target="_blank" class="action-btn template-btn">Excel 範本下載</a>
                     <div id="import-status"></div>
                     <!-- Status message area -->
                 </div>
@@ -524,7 +524,7 @@
             function populateYearOptions() {
                 const yearSelect = document.getElementById('year');
                 const currentYear = new Date().getFullYear();
-                const startYear = currentYear - 2;
+                const startYear = currentYear - 1;
                 const endYear = currentYear + 3; // Add a few future years, like 2025
 
                 for (let i = startYear; i <= endYear; i++) {
@@ -565,22 +565,77 @@
                 return new Date(year, month, 0).getDate();
             }
 
-            // --- (loadMonthData, goToPrevMonth, goToNextMonth functions remain mostly the same) ---
             function loadMonthData() {
                 const year = parseInt(document.getElementById('year').value);
                 const month = parseInt(document.getElementById('month').value);
-                const statusDiv = document.getElementById('import-status'); // Clear status on load
-                if (statusDiv) {
-                    statusDiv.textContent = '';
-                    statusDiv.className = ''; // Reset class
-                }
 
-                // Simulate fetching data (replace with your actual fetch if needed)
-                console.log(`Loading data for ${year}-${month}`);
-                // In a real scenario, you'd fetch here. For demo, we just create empty data.
-                createEmptyMonthData(year, month);
-                renderTable();
-                updateSummary();
+                // 先從後端獲取數據
+                fetch(`/api/overtime?year=${year}&month=${month}`)
+                    .then((response) => response.json())
+                    .then((data) => {
+                        // 將數據轉換為以日期為鍵的對象，方便後續處理
+                        const dataMap = {};
+                        data.forEach((item) => {
+                            dataMap[item.date] = item;
+                        });
+
+                        // 創建整月的數據
+                        const daysInMonth = getDaysInMonth(year, month);
+                        monthData = [];
+
+                        for (let day = 1; day <= daysInMonth; day++) {
+                            const date = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                            const dayDate = new Date(year, month - 1, day);
+                            const weekday = dayDate.getDay(); // 0 是星期日，1-6 是星期一到星期六
+
+                            // 如果有現有數據，使用它，否則創建新項目
+                            if (dataMap[date]) {
+                                monthData.push({
+                                    ...dataMap[date],
+                                    weekday: weekdayNames[weekday],
+                                });
+                            } else {
+                                monthData.push({
+                                    date: date,
+                                    weekday: weekdayNames[weekday],
+                                    startTime: '',
+                                    endTime: '',
+                                    overtimeHours: 0,
+                                    overtimePay: 0,
+                                });
+                            }
+                        }
+
+                        renderTable();
+                        updateSummary();
+                    })
+                    .catch((error) => {
+                        console.error('獲取資料失敗:', error);
+
+                        // 如果加載失敗，使用空數據創建整月表格
+                        const year = parseInt(document.getElementById('year').value);
+                        const month = parseInt(document.getElementById('month').value);
+                        const daysInMonth = getDaysInMonth(year, month);
+                        monthData = [];
+
+                        for (let day = 1; day <= daysInMonth; day++) {
+                            const date = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                            const dayDate = new Date(year, month - 1, day);
+                            const weekday = dayDate.getDay();
+
+                            monthData.push({
+                                date: date,
+                                weekday: weekdayNames[weekday],
+                                startTime: '',
+                                endTime: '',
+                                overtimeHours: 0,
+                                overtimePay: 0,
+                            });
+                        }
+
+                        renderTable();
+                        updateSummary();
+                    });
             }
 
             function createEmptyMonthData(year, month) {
@@ -616,7 +671,7 @@
                     monthSelect.value = currentMonth;
                     loadMonthData();
                 } else {
-                    alert(`無法切換到 ${currentYear} 年，該年份不存在於選項中。`);
+                    alert(`無法切換到 ${currentYear} 年，該年份不在選項中。`);
                 }
             }
 
@@ -635,7 +690,7 @@
                     monthSelect.value = currentMonth;
                     loadMonthData();
                 } else {
-                    alert(`無法切換到 ${currentYear} 年，該年份不存在於選項中。`);
+                    alert(`無法切換到 ${currentYear} 年，該年份不在選項中。`);
                 }
             }
 
@@ -700,7 +755,7 @@
 
                     // Overtime Pay (Read-only)
                     const overtimePayCell = document.createElement('td');
-                    overtimePayCell.textContent = entry.overtimePay ? entry.overtimePay.toFixed(2) : '0.00'; // Use toFixed(2) for currency
+                    overtimePayCell.textContent = entry.overtimePay ? entry.overtimePay.toFixed(0) : '0'; // Use toFixed(2) for currency
                     row.appendChild(overtimePayCell);
 
                     tableBody.appendChild(row);
@@ -799,18 +854,20 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ year: year, month: month, data: dataToSave }),
                 })
-                .then(response => {
-                    if (!response.ok) { throw new Error('Network response was not ok'); }
-                    return response.json();
-                })
-                .then(result => {
-                    console.log('Save success:', result);
-                    alert('數據保存成功！');
-                })
-                .catch(error => {
-                    console.error('保存數據失敗:', error);
-                    alert('保存失敗，請重試！');
-                });
+                    .then((response) => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then((result) => {
+                        console.log('Save success:', result);
+                        alert('存檔成功！');
+                    })
+                    .catch((error) => {
+                        console.error('存檔失敗:', error);
+                        alert('存檔失敗，請重試！');
+                    });
             }
 
             // --- NEW: Excel Import Functionality ---
@@ -993,10 +1050,10 @@
                         statusDiv.textContent = `成功匯入 ${importCount} 筆記錄。 (共處理 ${rowsProcessed} 行)`;
                         statusDiv.className = 'success';
                     } else if (rowsProcessed > 0) {
-                        statusDiv.textContent = `處理了 ${rowsProcessed} 行，但沒有找到可更新的匹配日期或時間。請檢查 Excel 檔案內容和當前選擇的月份 (${currentYear}/${currentMonth})。`;
+                        statusDiv.textContent = `處理了 ${rowsProcessed} 行，但沒有找到可更新的日期或時間。請檢查 Excel 檔案內容和目前選擇的月份 (${currentYear}/${currentMonth})。`;
                         statusDiv.className = 'error';
                     } else {
-                        statusDiv.textContent = 'Excel 檔案為空或未包含有效數據行。';
+                        statusDiv.textContent = 'Excel 檔案為空或未包含有效資料。';
                         statusDiv.className = 'error';
                     }
                 } catch (error) {
