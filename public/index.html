@@ -167,62 +167,91 @@
 
             /* --- Action Buttons Container --- */
             .action-buttons {
-                margin-top: 20px;
-                display: flex; /* Use flexbox for layout */
-                justify-content: space-between; /* Space out buttons */
-                align-items: center; /* Align items vertically */
-                flex-wrap: wrap; /* Allow wrapping on small screens */
-                gap: 15px; /* Add space between items if they wrap */
+                margin-top: 25px; /* Or your preferred margin */
+                display: flex; /* Enable Flexbox */
+                justify-content: space-between; /* Push left group and save button apart */
+                align-items: flex-start; /* Align tops of items */
+                flex-wrap: wrap; /* Allow wrapping on smaller screens */
+                gap: 20px; /* Add gap between items when they wrap */
             }
 
-            /* --- Import Button Styles --- */
-            .import-btn {
-                padding: 10px 25px;
-                background-color: #007bff; /* Blue color for import */
-                color: white;
+            /* --- Left Button Group (Import, Template, Status) --- */
+            .button-group-left {
+                display: flex; /* Use flexbox for the inner group too */
+                flex-wrap: wrap; /* Allow buttons inside to wrap if needed */
+                align-items: center; /* Vertically center buttons in this group */
+                gap: 15px; /* Space between Import and Template buttons */
+            }
+
+            /* --- General Action Button Styling --- */
+            .action-btn {
+                padding: 10px 20px; /* Consistent padding */
                 border: none;
                 border-radius: 5px;
                 cursor: pointer;
                 font-size: 1rem;
-                transition: background-color 0.2s ease;
-                display: inline-block; /* Make label behave like a button */
+                text-decoration: none; /* Remove underline from link */
+                color: white; /* Default text color */
+                transition: background-color 0.2s ease, opacity 0.2s ease;
+                display: inline-block; /* Ensure label and link behave like buttons */
                 text-align: center;
+                white-space: nowrap; /* Prevent button text wrapping */
+            }
+            .action-btn:hover {
+                opacity: 0.9; /* Slight hover effect */
+            }
+
+            /* Specific Button Styles (Keep your existing or use these) */
+            .import-btn {
+                background-color: #007bff; /* Blue for import */
+                /* Inherits .action-btn styles */
             }
             .import-btn:hover {
-                background-color: #0056b3; /* Darker blue on hover */
+                background-color: #0056b3;
             }
+
+            .template-btn {
+                background-color: #6c757d; /* Grey for template/info */
+                /* Inherits .action-btn styles */
+                color: white !important; /* Ensure link text is white */
+            }
+            .template-btn:hover {
+                background-color: #5a6268;
+            }
+
+            .save-btn {
+                background-color: #28a745; /* Green for save */
+                /* Inherits .action-btn styles */
+                /* Align this button with the top of the other group on large screens */
+                align-self: flex-start;
+            }
+            .save-btn:hover {
+                background-color: #218838;
+            }
+
             /* Hide the actual file input */
             #excel-file-input {
                 display: none;
             }
+
+            /* Status Message Styling */
             #import-status {
-                margin-top: 5px; /* Space above status message */
+                flex-basis: 100%; /* Make status take full width within its group */
+                order: 3; /* Ensure status appears after the buttons in its group */
+                margin-top: 10px; /* Space above the status message */
                 font-size: 0.9em;
                 min-height: 1.2em; /* Prevent layout shift */
-                text-align: left; /* Align status text left */
-                flex-basis: 100%; /* Make status take full width if wrapping */
-                order: 3; /* Ensure status appears below buttons if wrapped */
+                text-align: left; /* Align status text left by default */
+                padding-left: 0; /* No extra indent needed here */
+                color: #333; /* Default color */
             }
             #import-status.success {
-                color: green;
+                color: #28a745;
+                font-weight: bold;
             }
             #import-status.error {
-                color: red;
-            }
-
-            /* --- Save Button --- */
-            .save-btn {
-                padding: 10px 25px;
-                background-color: #28a745;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                font-size: 1rem;
-                transition: background-color 0.2s ease;
-            }
-            .save-btn:hover {
-                background-color: #218838;
+                color: #dc3545;
+                font-weight: bold;
             }
 
             /* --- Summary Section --- */
@@ -320,19 +349,26 @@
                     padding: 5px 6px;
                     font-size: 0.9em;
                 }
-                /* Adjust action buttons layout */
+
+                /* RWD for Action Buttons */
                 .action-buttons {
-                    justify-content: center; /* Center buttons when they stack */
+                    justify-content: center; /* Center items when they wrap */
+                    gap: 15px; /* Reduce gap */
                 }
-                .import-btn,
-                .save-btn {
-                    padding: 10px 20px;
+                /* Center the inner group's content too */
+                .button-group-left {
+                    justify-content: center;
+                }
+                .action-btn {
+                    padding: 9px 18px;
                     font-size: 0.95rem;
-                    flex-grow: 1; /* Allow buttons to grow */
-                    min-width: 120px; /* Ensure minimum tappable area */
+                    /* Optional: Allow buttons to grow */
+                    /* flex-grow: 1; */
+                    /* min-width: 110px; */
                 }
                 #import-status {
-                    text-align: center;
+                    text-align: center; /* Center status text */
+                    margin-top: 15px;
                 }
 
                 .summary {
@@ -372,16 +408,28 @@
                     font-size: 0.85em;
                 }
 
+                /* RWD for Action Buttons */
+                /* Stack the main container items */
                 .action-buttons {
-                    flex-direction: column; /* Stack buttons vertically */
-                    align-items: stretch; /* Stretch buttons full width */
+                    flex-direction: column;
+                    align-items: stretch; /* Make items full width */
                 }
-                .import-btn,
-                .save-btn {
-                    width: 100%; /* Make buttons full width */
+                /* Make buttons inside the left group also full width */
+                .button-group-left {
+                    flex-direction: column;
+                    align-items: stretch;
+                    gap: 10px; /* Space between stacked buttons in group */
+                }
+                .action-btn {
+                    width: 100%;
                     padding: 12px;
                     font-size: 1rem;
-                    box-sizing: border-box;
+                    box-sizing: border-box; /* Include padding in width */
+                }
+                /* Ensure status stays at bottom */
+                #import-status {
+                    order: 5; /* Make sure it's last */
+                    text-align: center;
                 }
 
                 .summary {
@@ -435,14 +483,19 @@
 
             <!-- Modified Action Buttons Section -->
             <div class="action-buttons">
-                <div>
+                <div class="button-group-left">
+                    <!-- Added a class for easier targeting -->
                     <!-- Wrapper for import button and status -->
-                    <label for="excel-file-input" class="import-btn">匯入 Excel</label>
+                    <label for="excel-file-input" class="action-btn import-btn">匯入 Excel</label>
                     <input type="file" id="excel-file-input" accept=".xlsx, .xls" onchange="handleExcelImport(event)" />
+                    <!-- Changed the invalid button to a styled link -->
+                    <a href="https://louis-check-in-html.vercel.app/excelDemo.xlsx" target="_blank" class="action-btn template-btn">Excel 範本</a>
                     <div id="import-status"></div>
                     <!-- Status message area -->
                 </div>
-                <button class="save-btn" onclick="saveData()">存 檔</button>
+
+                <button class="action-btn save-btn" onclick="saveData()">存 檔</button>
+                <!-- Keep save button separate -->
             </div>
             <!-- End Modified Section -->
 
@@ -465,10 +518,6 @@
                 populateYearOptions();
                 populateMonthOptions();
                 loadMonthData(); // Initial load
-                // Set year/month for example (Optional, remove if you want current month default)
-                // document.getElementById('year').value = 2025;
-                // document.getElementById('month').value = 4;
-                // loadMonthData(); // Load data for 2025/4 if set above
             };
 
             // --- (populateYearOptions, populateMonthOptions, getDaysInMonth functions remain the same) ---
@@ -484,21 +533,16 @@
                     option.value = i;
                     option.textContent = i + '年';
                     if (i === currentYear) {
-                        // Don't select current year by default if we force 2025/4 later
-                        // option.selected = true;
+                        option.selected = true; // Default to current year
                     }
                     yearSelect.appendChild(option);
                 }
-                // If you want to default to 2025 for the demo:
-                if (yearSelect.querySelector('option[value="2025"]')) {
-                    yearSelect.value = 2025;
-                } else {
-                    // Add 2025 if it wasn't in the initial range
+                // Add 2025 if it wasn't in the initial range, but don't select it by default
+                if (!yearSelect.querySelector('option[value="2025"]')) {
                     const option2025 = document.createElement('option');
                     option2025.value = 2025;
                     option2025.textContent = '2025年';
                     yearSelect.appendChild(option2025);
-                    yearSelect.value = 2025; // Select it
                 }
             }
 
@@ -510,14 +554,12 @@
                     const option = document.createElement('option');
                     option.value = i;
                     option.textContent = i + '月';
-                    // Don't select current month by default if we force 2025/4 later
-                    // if (i === currentMonth) {
-                    //     option.selected = true;
-                    // }
+                    if (i === currentMonth) {
+                        // Default to current month
+                        option.selected = true;
+                    }
                     monthSelect.appendChild(option);
                 }
-                // If you want to default to April for the demo:
-                monthSelect.value = 4;
             }
             function getDaysInMonth(year, month) {
                 return new Date(year, month, 0).getDate();
@@ -528,7 +570,10 @@
                 const year = parseInt(document.getElementById('year').value);
                 const month = parseInt(document.getElementById('month').value);
                 const statusDiv = document.getElementById('import-status'); // Clear status on load
-                if (statusDiv) statusDiv.textContent = '';
+                if (statusDiv) {
+                    statusDiv.textContent = '';
+                    statusDiv.className = ''; // Reset class
+                }
 
                 // Simulate fetching data (replace with your actual fetch if needed)
                 console.log(`Loading data for ${year}-${month}`);
@@ -536,38 +581,6 @@
                 createEmptyMonthData(year, month);
                 renderTable();
                 updateSummary();
-
-            fetch(`/api/overtime?year=${year}&month=${month}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    const dataMap = {};
-                    data.forEach(item => { dataMap[item.date] = item; });
-                    const daysInMonth = getDaysInMonth(year, month);
-                    monthData = [];
-                    for (let day = 1; day <= daysInMonth; day++) {
-                        const date = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                        const dayDate = new Date(year, month - 1, day);
-                        const weekday = dayDate.getDay();
-                        if (dataMap[date]) {
-                            monthData.push({ ...dataMap[date], weekday: weekdayNames[weekday] });
-                        } else {
-                            monthData.push({ date: date, weekday: weekdayNames[weekday], startTime: '', endTime: '', overtimeHours: 0, overtimePay: 0 });
-                        }
-                    }
-                    renderTable();
-                    updateSummary();
-                })
-                .catch(error => {
-                    console.error('加載數據失敗:', error);
-                    createEmptyMonthData(year, month); // Create empty data on fetch failure
-                    renderTable();
-                    updateSummary();
-                });
             }
 
             function createEmptyMonthData(year, month) {
@@ -781,23 +794,23 @@
 
                 console.log('Saving data:', { year, month, data: dataToSave }); // For testing
 
-            fetch('/api/overtime', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ year: year, month: month, data: dataToSave }),
-            })
-            .then(response => {
-                if (!response.ok) { throw new Error('Network response was not ok'); }
-                return response.json();
-            })
-            .then(result => {
-                console.log('Save success:', result);
-                alert('數據保存成功！');
-            })
-            .catch(error => {
-                console.error('保存數據失敗:', error);
-                alert('保存失敗，請重試！');
-            });
+                fetch('/api/overtime', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ year: year, month: month, data: dataToSave }),
+                })
+                .then(response => {
+                    if (!response.ok) { throw new Error('Network response was not ok'); }
+                    return response.json();
+                })
+                .then(result => {
+                    console.log('Save success:', result);
+                    alert('數據保存成功！');
+                })
+                .catch(error => {
+                    console.error('保存數據失敗:', error);
+                    alert('保存失敗，請重試！');
+                });
             }
 
             // --- NEW: Excel Import Functionality ---
@@ -822,7 +835,7 @@
                 }
 
                 statusDiv.textContent = '正在讀取檔案...';
-                statusDiv.className = '';
+                statusDiv.className = ''; // Reset class
 
                 const reader = new FileReader();
 
@@ -845,6 +858,7 @@
                 const statusDiv = document.getElementById('import-status');
                 const fileInput = document.getElementById('excel-file-input');
                 statusDiv.textContent = '正在解析 Excel 內容...';
+                statusDiv.className = ''; // Reset class
 
                 try {
                     // Use { cellDates: true } to help SheetJS parse dates and times as JS Date objects
