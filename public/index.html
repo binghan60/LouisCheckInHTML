@@ -626,7 +626,7 @@
             }
 
             function loadMonthData() {
-                document.querySelector('.loading-overlay').display = 'flex';
+                document.querySelector('.loading-overlay').style.display = 'flex';
                 const year = parseInt(document.getElementById('year').value);
                 const month = parseInt(document.getElementById('month').value);
 
@@ -698,7 +698,7 @@
                         updateSummary();
                     })
                     .finally(function () {
-                        document.querySelector('.loading-overlay').display = 'none';
+                        document.querySelector('.loading-overlay').style.display = 'none';
                     });
             }
 
@@ -907,7 +907,7 @@
 
             // --- (saveData function remains the same) ---
             function saveData() {
-                document.querySelector('.loading-overlay').display = 'flex';
+                document.querySelector('.loading-overlay').style.display = 'flex';
 
                 const year = parseInt(document.getElementById('year').value);
                 const month = parseInt(document.getElementById('month').value);
@@ -928,14 +928,13 @@
                     })
                     .then((result) => {
                         console.log('Save success:', result);
-                        alert('存檔成功！');
                     })
                     .catch((error) => {
                         console.error('存檔失敗:', error);
                         alert('存檔失敗，請重試！');
                     })
                     .finally(function () {
-                        document.querySelector('.loading-overlay').display = 'none';
+                        document.querySelector('.loading-overlay').style.display = 'none';
                     });
             }
 
