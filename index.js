@@ -9,7 +9,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // 連接MongoDB
-mongoose.connect('mongodb://localhost:27017/overtime_tracker')
+mongoose.connect(process.env.MONGODB_URI)
 .then(() => console.log('已連接到MongoDB'))
 .catch(err => console.error('MongoDB連接錯誤:', err));
 
