@@ -782,9 +782,7 @@
                 const dataToSave = monthData.filter((entry) => entry.startTime || entry.endTime);
 
                 console.log('Saving data:', { year, month, data: dataToSave }); // For testing
-                alert('模擬保存成功！\n（實際應用中，請替換為 fetch 調用）'); // Placeholder alert
 
-                /* --- Replace with actual fetch ---
             fetch('/api/overtime', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -802,7 +800,6 @@
                 console.error('保存數據失敗:', error);
                 alert('保存失敗，請重試！');
             });
-            */
             }
 
             // --- NEW: Excel Import Functionality ---
