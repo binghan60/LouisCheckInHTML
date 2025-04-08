@@ -16,6 +16,13 @@ mongoose
     .catch((err) => console.error('MongoDB連接錯誤:', err));
 
 // 定義加班記錄的模型
+const userSchema = new mongoose.Schema({
+    username: String,
+    password: String,
+    salary: Number,
+})
+const User = mongoose.model('User', userSchema)
+
 const overtimeEntrySchema = new mongoose.Schema({
     date: String,
     startTime: String,
@@ -39,6 +46,38 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // API路由
+
+
+app.get('/api/user', async (req, res) => {
+    try {
+        const { Id } = req.query
+        const user = await User.findById(Id)
+
+        res.json(user)
+    } catch (error) {
+        console.error('查詢錯誤:', error);
+        res.status(500).json({ message: '伺服器錯誤' });
+    }
+})
+
+app.post('/api/user', async (req, res) => {
+    try {
+        const { username, password, salary } = req.body;
+        const newUser = new User({
+            username,
+            password,
+            salary
+        })
+        await newUser.save()
+
+        res.json(newUser)
+
+    } catch (error) {
+        console.error('保存錯誤:', error);
+        res.status(500).json({ message: '伺服器錯誤' });
+
+    }
+})
 
 // 獲取特定年月的加班記錄
 app.get('/api/overtime', async (req, res) => {
