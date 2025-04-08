@@ -80,8 +80,9 @@ app.post('/api/user', async (req, res) => {
 // 獲取特定年月的加班記錄
 app.get('/api/overtime', async (req, res) => {
     try {
-        const { year, month } = req.query;
+        const {userId, year, month } = req.query;
         const record = await OvertimeRecord.findOne({
+            userId,
             year: parseInt(year),
             month: parseInt(month),
         });
