@@ -118,6 +118,7 @@ app.post('/api/overtime', async (req, res) => {
         } else {
             // 創建新記錄
             record = new OvertimeRecord({
+                userId,
                 year: parseInt(year),
                 month: parseInt(month),
                 data: data,
