@@ -35,7 +35,7 @@ const overtimeRecordSchema = new mongoose.Schema({
     year: Number,
     month: Number,
     data: [overtimeEntrySchema],
-    salarySnapshot: Number,
+    salary: Number,
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 });
