@@ -19,9 +19,17 @@ mongoose
 const userSchema = new mongoose.Schema({
     username: String,
     password: String,
-    salary: Number,
-})
+  });
 const User = mongoose.model('User', userSchema)
+
+const salaryHistorySchema = new mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    month: String, // e.g., "2025-04"
+    salary: Number,
+  });
+
+const SalaryHistory = mongoose.model('SalaryHistory',salaryHistorySchema)
+  
 
 const overtimeEntrySchema = new mongoose.Schema({
     date: String,
@@ -29,9 +37,11 @@ const overtimeEntrySchema = new mongoose.Schema({
     endTime: String,
     overtimeHours: Number,
     overtimePay: Number,
+    salarySnapshot: Number,
 });
 
 const overtimeRecordSchema = new mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     year: Number,
     month: Number,
     data: [overtimeEntrySchema],
@@ -52,7 +62,6 @@ app.get('/api/user', async (req, res) => {
     try {
         const { Id } = req.query
         const user = await User.findById(Id)
-
         res.json(user)
     } catch (error) {
         console.error('查詢錯誤:', error);
@@ -62,11 +71,10 @@ app.get('/api/user', async (req, res) => {
 
 app.post('/api/user', async (req, res) => {
     try {
-        const { username, password, salary } = req.body;
+        const { username, password,  } = req.body;
         const newUser = new User({
             username,
             password,
-            salary
         })
         await newUser.save()
 
