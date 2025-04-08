@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const path = require('path');
 const dotenv = require('dotenv');
+const cors = require('cors');
+
 dotenv.config();
 // 創建Express應用
 const app = express();
@@ -21,37 +23,27 @@ const userSchema = new mongoose.Schema({
     password: String,
   });
 const User = mongoose.model('User', userSchema)
-
-const salaryHistorySchema = new mongoose.Schema({
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    month: String, // e.g., "2025-04"
-    salary: Number,
-  });
-
-const SalaryHistory = mongoose.model('SalaryHistory',salaryHistorySchema)
-  
-
 const overtimeEntrySchema = new mongoose.Schema({
     date: String,
     startTime: String,
     endTime: String,
     overtimeHours: Number,
     overtimePay: Number,
-    salarySnapshot: Number,
 });
-
 const overtimeRecordSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     year: Number,
     month: Number,
     data: [overtimeEntrySchema],
+    salarySnapshot: Number,
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 });
-
 const OvertimeRecord = mongoose.model('OvertimeRecord', overtimeRecordSchema);
 
 // 中間件
+
+app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
