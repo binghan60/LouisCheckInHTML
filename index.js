@@ -87,7 +87,7 @@ app.get('/api/overtime', async (req, res) => {
             month: parseInt(month),
         });
         if (record) {
-            res.json(record.data);
+            res.json(record);
         } else {
             // 如果找不到記錄，返回空數組
             res.json([]);
