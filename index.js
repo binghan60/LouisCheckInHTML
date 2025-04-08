@@ -52,8 +52,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/api/user', async (req, res) => {
     try {
-        const { Id } = req.query
-        const user = await User.findById(Id)
+        const { id } = req.query
+        const user = await User.findById(id)
         res.json(user)
     } catch (error) {
         console.error('查詢錯誤:', error);
@@ -69,9 +69,7 @@ app.post('/api/user', async (req, res) => {
             password,
         })
         await newUser.save()
-
         res.json(newUser)
-
     } catch (error) {
         console.error('保存錯誤:', error);
         res.status(500).json({ message: '伺服器錯誤' });
