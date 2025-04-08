@@ -90,7 +90,7 @@ app.get('/api/overtime', async (req, res) => {
             res.json(record);
         } else {
             // 如果找不到記錄，返回空數組
-            res.json([]);
+            res.json({});
         }
     } catch (error) {
         console.error('查詢錯誤:', error);
