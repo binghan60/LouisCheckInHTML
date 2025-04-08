@@ -126,7 +126,7 @@ app.post('/api/overtime', async (req, res) => {
             await record.save();
         }
 
-        res.json({ success: true, message: '數據保存成功' });
+        res.json({ success: true, message: '數據保存成功' ,record});
     } catch (error) {
         console.error('保存錯誤:', error);
         res.status(500).json({ message: '伺服器錯誤' });
