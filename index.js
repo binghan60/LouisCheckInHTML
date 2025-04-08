@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const path = require('path');
 const dotenv = require('dotenv');
+const cors = require('cors');
+
 dotenv.config();
 // 創建Express應用
 const app = express();
@@ -19,39 +21,29 @@ mongoose
 const userSchema = new mongoose.Schema({
     username: String,
     password: String,
-  });
+});
 const User = mongoose.model('User', userSchema)
-
-const salaryHistorySchema = new mongoose.Schema({
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    month: String, // e.g., "2025-04"
-    salary: Number,
-  });
-
-const SalaryHistory = mongoose.model('SalaryHistory',salaryHistorySchema)
-  
-
 const overtimeEntrySchema = new mongoose.Schema({
     date: String,
     startTime: String,
     endTime: String,
     overtimeHours: Number,
     overtimePay: Number,
-    salarySnapshot: Number,
 });
-
 const overtimeRecordSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     year: Number,
     month: Number,
     data: [overtimeEntrySchema],
+    salary: Number,
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 });
-
 const OvertimeRecord = mongoose.model('OvertimeRecord', overtimeRecordSchema);
 
 // 中間件
+
+app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -60,8 +52,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/api/user', async (req, res) => {
     try {
-        const { Id } = req.query
-        const user = await User.findById(Id)
+        const { id } = req.query
+        const user = await User.findById(id)
         res.json(user)
     } catch (error) {
         console.error('查詢錯誤:', error);
@@ -71,15 +63,13 @@ app.get('/api/user', async (req, res) => {
 
 app.post('/api/user', async (req, res) => {
     try {
-        const { username, password,  } = req.body;
+        const { username, password, } = req.body;
         const newUser = new User({
             username,
             password,
         })
         await newUser.save()
-
         res.json(newUser)
-
     } catch (error) {
         console.error('保存錯誤:', error);
         res.status(500).json({ message: '伺服器錯誤' });
@@ -90,16 +80,17 @@ app.post('/api/user', async (req, res) => {
 // 獲取特定年月的加班記錄
 app.get('/api/overtime', async (req, res) => {
     try {
-        const { year, month } = req.query;
+        const { userId, year, month } = req.query;
         const record = await OvertimeRecord.findOne({
+            userId,
             year: parseInt(year),
             month: parseInt(month),
         });
         if (record) {
-            res.json(record.data);
+            res.json(record);
         } else {
             // 如果找不到記錄，返回空數組
-            res.json([]);
+            res.json({});
         }
     } catch (error) {
         console.error('查詢錯誤:', error);
@@ -110,10 +101,10 @@ app.get('/api/overtime', async (req, res) => {
 // 保存加班記錄
 app.post('/api/overtime', async (req, res) => {
     try {
-        const { year, month, data } = req.body;
-
+        const { userId, year, month, data, salary } = req.body;
         // 查找現有記錄
         let record = await OvertimeRecord.findOne({
+            userId,
             year: parseInt(year),
             month: parseInt(month),
         });
@@ -122,18 +113,21 @@ app.post('/api/overtime', async (req, res) => {
             // 更新現有記錄
             record.data = data;
             record.updatedAt = new Date();
+            record.salary = salary
             await record.save();
         } else {
             // 創建新記錄
             record = new OvertimeRecord({
+                userId,
                 year: parseInt(year),
                 month: parseInt(month),
                 data: data,
+                salary: salary
             });
             await record.save();
         }
 
-        res.json({ success: true, message: '數據保存成功' });
+        res.json({ success: true, message: '數據保存成功' ,record});
     } catch (error) {
         console.error('保存錯誤:', error);
         res.status(500).json({ message: '伺服器錯誤' });
