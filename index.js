@@ -121,7 +121,7 @@ app.post('/api/overtime', async (req, res) => {
                 year: parseInt(year),
                 month: parseInt(month),
                 data: data,
-                salary
+                salary: salary
             });
             await record.save();
         }
