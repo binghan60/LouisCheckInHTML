@@ -10,7 +10,6 @@ dotenv.config();
 // 創建Express應用
 const app = express();
 const PORT = process.env.PORT || 3000;
-console.log(process.env.MONGODB_URI);
 // 連接MongoDB
 mongoose
     .connect(process.env.MONGODB_URI)
@@ -22,7 +21,7 @@ const userSchema = new mongoose.Schema({
     username: String,
     password: String,
 });
-const User = mongoose.model('User', userSchema)
+const User = mongoose.model('User', userSchema);
 const overtimeEntrySchema = new mongoose.Schema({
     date: String,
     startTime: String,
@@ -49,33 +48,31 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // API路由
 
-
 app.get('/api/user', async (req, res) => {
     try {
-        const { id } = req.query
-        const user = await User.findById(id)
-        res.json(user)
+        const { id } = req.query;
+        const user = await User.findById(id);
+        res.json(user);
     } catch (error) {
         console.error('查詢錯誤:', error);
         res.status(500).json({ message: '伺服器錯誤' });
     }
-})
+});
 
 app.post('/api/user', async (req, res) => {
     try {
-        const { username, password, } = req.body;
+        const { username, password } = req.body;
         const newUser = new User({
             username,
             password,
-        })
-        await newUser.save()
-        res.json(newUser)
+        });
+        await newUser.save();
+        res.json(newUser);
     } catch (error) {
         console.error('保存錯誤:', error);
         res.status(500).json({ message: '伺服器錯誤' });
-
     }
-})
+});
 
 // 獲取特定年月的加班記錄
 app.get('/api/overtime', async (req, res) => {
@@ -113,7 +110,7 @@ app.post('/api/overtime', async (req, res) => {
             // 更新現有記錄
             record.data = data;
             record.updatedAt = new Date();
-            record.salary = salary
+            record.salary = salary;
             await record.save();
         } else {
             // 創建新記錄
@@ -122,12 +119,12 @@ app.post('/api/overtime', async (req, res) => {
                 year: parseInt(year),
                 month: parseInt(month),
                 data: data,
-                salary: salary
+                salary: salary,
             });
             await record.save();
         }
 
-        res.json({ success: true, message: '數據保存成功' ,record});
+        res.json({ success: true, message: '數據保存成功', record });
     } catch (error) {
         console.error('保存錯誤:', error);
         res.status(500).json({ message: '伺服器錯誤' });
