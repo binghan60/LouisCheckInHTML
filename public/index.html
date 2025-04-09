@@ -554,7 +554,7 @@
                                 <td>
                                     <input type="time" class="time-input" v-model="entry.endTime" @change="updateTimeAndCalculate(index, 'endTime', entry.endTime, isWeekend(entry.weekday))" />
                                 </td>
-                                <td>{{ isWeekend(entry.weekday) ? 0 : 9 }}</td>
+                                <td>{{ isWeekend(entry.weekday) ? 1 : 9 }}</td>
                                 <td>{{ entry.overtimeHours.toFixed(2) }}</td>
                                 <td>{{ entry.overtimePay.toFixed(0) }}</td>
                             </tr>
