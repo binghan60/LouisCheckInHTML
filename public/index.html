@@ -692,7 +692,7 @@
                                 updateAllOvertimeCalculations();
                             })
                             .catch((error) => {
-                                console.error('獲取資料失敗:', error);
+                                // console.error('獲取資料失敗:', error);
                                 monthData.value = createEmptyMonthData(selectedYear.value, selectedMonth.value);
                             })
                             .finally(() => {
