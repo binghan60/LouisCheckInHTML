@@ -28,6 +28,7 @@ const overtimeEntrySchema = new mongoose.Schema({
     endTime: String,
     overtimeHours: Number,
     overtimePay: Number,
+    isHoliday: Boolean, // 新增的假日標記欄位
 });
 const overtimeRecordSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
