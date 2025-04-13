@@ -527,6 +527,18 @@
             .holiday td {
                 background-color: #ffebee;
             }
+            .form-input {
+                padding: 8px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                font-size: 16px;
+            }
+
+            .form-input:disabled {
+                background-color: #e5e5e5;
+                color: #999;
+                cursor: not-allowed;
+            }
         </style>
     </head>
     <body>
@@ -536,21 +548,21 @@
                 <div class="controls">
                     <div class="month-selector">
                         <label for="year">年份:</label>
-                        <select id="year" v-model="selectedYear" @change="loadMonthData">
+                        <select class="form-input" id="year" v-model="selectedYear" @change="loadMonthData" :disabled="formLock">
                             <option v-for="year in yearOptions" :key="year" :value="year">{{ year }}年</option>
                         </select>
                         <label for="month">月份:</label>
-                        <select id="month" v-model="selectedMonth" @change="loadMonthData">
+                        <select class="form-input" id="month" v-model="selectedMonth" @change="loadMonthData" :disabled="formLock">
                             <option v-for="month in 12" :key="month" :value="month">{{ month }}月</option>
                         </select>
-                        <button class="month-nav-btn" @click="goToPrevMonth">上月</button>
-                        <button class="month-nav-btn" @click="goToNextMonth">下月</button>
+                        <button class="month-nav-btn form-input" @click="goToPrevMonth" :disabled="formLock">上月</button>
+                        <button class="month-nav-btn form-input" @click="goToNextMonth" :disabled="formLock">下月</button>
                     </div>
                     <div class="month-selector">
                         <label for="username">姓名:</label>
-                        <input style="color: gray" type="text" id="username" v-model="username" disabled />
+                        <input class="form-input" style="color: gray" type="text" id="username" v-model="username" disabled />
                         <label for="salary">本月薪資:</label>
-                        <input type="text" id="salary" v-model="salary" @input="updateAllOvertimeCalculations" autocomplete="off" />
+                        <input class="form-input" type="text" id="salary" v-model="salary" @input="updateAllOvertimeCalculations" autocomplete="off" :disabled="formLock" />
                     </div>
                 </div>
 
@@ -574,13 +586,13 @@
                                 <td>{{ entry.date.slice(5) }}</td>
                                 <td>{{ entry.weekday }}</td>
                                 <td>
-                                    <button class="holiday-toggle-btn" @click="toggleHoliday(index)" :class="{ active: entry.isHoliday }">{{ entry.isHoliday ? '休' : '上' }}</button>
+                                    <button class="holiday-toggle-btn form-input" @click="toggleHoliday(index)" :class="{ active: entry.isHoliday }" :disabled="formLock">{{ entry.isHoliday ? '休' : '上' }}</button>
                                 </td>
                                 <td>
-                                    <input type="time" class="time-input" v-model="entry.startTime" @change="updateTimeAndCalculate(index, 'startTime', entry.startTime)" />
+                                    <input type="time" class="time-input form-input" v-model="entry.startTime" @change="updateTimeAndCalculate(index, 'startTime', entry.startTime)" :disabled="formLock" />
                                 </td>
                                 <td>
-                                    <input type="time" class="time-input" v-model="entry.endTime" @change="updateTimeAndCalculate(index, 'endTime', entry.endTime)" />
+                                    <input type="time" class="time-input form-input" v-model="entry.endTime" @change="updateTimeAndCalculate(index, 'endTime', entry.endTime)" :disabled="formLock" />
                                 </td>
                                 <td>{{ entry.isHoliday ? 1 : 9 }}</td>
                                 <td>{{ entry.overtimeHours.toFixed(2) }}</td>
@@ -592,13 +604,13 @@
 
                 <div class="action-buttons">
                     <div class="button-group-left">
-                        <label for="excel-file-input" class="action-btn import-btn">匯入 Excel</label>
-                        <input type="file" id="excel-file-input" accept=".xlsx, .xls" @change="handleExcelImport" />
-                        <a href="https://louis-check-in-html.vercel.app/excelDemo.xlsx" target="_blank" class="action-btn template-btn">Excel 範本下載</a>
+                        <label for="excel-file-input" class="action-btn import-btn form-input" :disabled="formLock">匯入 Excel</label>
+                        <input type="file" id="excel-file-input" accept=".xlsx, .xls" @change="handleExcelImport" :disabled="formLock" />
+                        <a v-if="!formLock" href="https://louis-check-in-html.vercel.app/excelDemo.xlsx" target="_blank" class="action-btn template-btn">Excel 範本下載</a>
                         <div id="import-status" :class="importStatusClass">{{ importStatus }}</div>
                     </div>
 
-                    <button class="action-btn save-btn" @click="saveData">存 檔</button>
+                    <button class="action-btn save-btn form-input" @click="saveData" :disabled="formLock">存 檔</button>
                 </div>
 
                 <div class="summary">
@@ -656,6 +668,8 @@
                     const totalOvertimePay = computed(() => {
                         return monthData.value.reduce((sum, entry) => sum + (entry.overtimePay || 0), 0);
                     });
+
+                    const formLock = ref(false);
 
                     // Methods
 
@@ -736,7 +750,12 @@
                         const urlParams = new URLSearchParams(window.location.search);
                         userId.value = urlParams.get('id');
 
-                        if (!userId.value) return;
+                        if (!userId.value) {
+                            formLock.value = true;
+                            console.log(formLock.value);
+                            showToast('發生錯誤', 'error');
+                            return;
+                        }
 
                         fetch(`${apipath}/user?id=${userId.value}`)
                             .then((response) => response.json())
@@ -1088,7 +1107,7 @@
                         yearOptions,
                         totalOvertimeHours,
                         totalOvertimePay,
-
+                        formLock,
                         // Methods
                         loadMonthData,
                         goToPrevMonth,
