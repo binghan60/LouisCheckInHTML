@@ -96,6 +96,44 @@ app.get('/api/overtime', async (req, res) => {
     }
 });
 
+// 獲取年度統計數據 (供圖表使用)
+app.get('/api/overtime/summary', async (req, res) => {
+    try {
+        const { userId, year } = req.query;
+        // 查找該用戶該年度的所有記錄
+        const records = await OvertimeRecord.find({
+            userId,
+            year: parseInt(year),
+        });
+
+        // 初始化 12 個月的數據
+        const monthlyStats = Array(12).fill(0).map((_, index) => ({
+            month: index + 1,
+            totalHours: 0,
+            totalPay: 0
+        }));
+
+        records.forEach(record => {
+            const monthIndex = record.month - 1;
+            if (monthIndex >= 0 && monthIndex < 12 && record.data) {
+                let hours = 0;
+                let pay = 0;
+                record.data.forEach(entry => {
+                    hours += entry.overtimeHours || 0;
+                    pay += entry.overtimePay || 0;
+                });
+                monthlyStats[monthIndex].totalHours = hours;
+                monthlyStats[monthIndex].totalPay = pay;
+            }
+        });
+
+        res.json(monthlyStats);
+    } catch (error) {
+        console.error('年度統計查詢錯誤:', error);
+        res.status(500).json({ message: '伺服器錯誤' });
+    }
+});
+
 // 保存加班記錄
 app.post('/api/overtime', async (req, res) => {
     try {
